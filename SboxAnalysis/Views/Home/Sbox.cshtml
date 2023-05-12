@@ -1,0 +1,325 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<style>
+    #results {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    table {
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+    tr {
+        padding: 0;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: #d9d9d9;
+    }
+
+    td {
+        width: 40px;
+        border: 1px solid #fe7914;
+        text-align: center;
+    }
+
+    tbody td:first-child, thead td {
+        background-color: #f0ad4e;
+        color: #eee;
+    }
+
+        tbody tr:nth-child(odd) td:first-child, thead td:nth-child(even) {
+            background-color: #fe7914;
+        }
+</style>
+
+<div class="row" style="margin-top:5%">
+    <div class="col-md-12">
+        
+        <div class="col-md-5">
+
+            <button type="button" id="random" class="btn btn-primary">Random Generate</button>
+            <button type="button" id="import" class="btn btn-success">Import</button>
+            <button type="button" id="export" class="btn btn-warning">Export</button>
+            <button type="button" id="analysis" class="btn btn-danger">Analysis</button>
+
+        </div>
+        <div class="col-md-2" style="margin-left:-9%">
+            @using (Html.BeginForm("ExportHTML", "Home", FormMethod.Post))
+            {
+                <input type="hidden" name="ExportData" />
+                <button type="submit" id="exportPdf" class="btn btn-danger">Export Pdf</button>
+
+            }
+        </div>
+
+        <div class="col-md-4" style="margin-top:-16px;margin-left:-7%">
+            @using (Html.BeginForm("Sbox", "Home", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return myFunction()" }))
+            {
+                <div class="form-group row">
+                    <div class="col-md-3" style="margin-left: 63px; margin-top: -6%">
+                        <input type="file" id="upload" name="upload" class="" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class=" col-md-3" style="">
+                        <input type="submit" value="Upload Excel File" id="btnSubmit" class="btn" style="background-color:#efefef" />
+
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:3%">
+    <div class="col-md-12">
+        <table>
+            <thead>
+                <tr>
+                    <th>+</th>
+                    <td>00</td>
+                    <td>01</td>
+                    <td>02</td>
+                    <td>03</td>
+
+                </tr>
+            </thead>
+            <tbody id="box" contenteditable>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row" style="margin-top:5%">
+    <div id="htmlSbox">
+        <table class="table" style="width:100%; font-size:12px; border: 2px solid #ddd">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">Evalatuion</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">Linear Probability</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">Differancial Probability</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">Nonlinearty Percentage</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">Nonlinearty</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">SAC</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">BIC-SAC</th>
+                    <th style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd" scope="col">BIC-NL</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd">Maximum</td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"> <label class="control-label" id="linearMax"></label> </td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="difMax"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="nonLinMax"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="maxNonLin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="bıcSacMax"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="sacMax"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="bicNl"></label></td>
+
+
+                </tr>
+                <tr style="border-left: 2px solid #ddd">
+                    <td style="border-left: 2px solid #ddd; ">Minimum</td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="linearMin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="difMin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="nonLinMin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="minNonLin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="bıcSacMin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="sacMin"></label></td>
+                    <td style="border-left: 2px solid #ddd;"><label class="control-label" id=""></label></td>
+
+
+                </tr>
+                <tr style="border-left: 2px solid #ddd">
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd">Avarage</td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"> <label class="control-label" id="linearAvg"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="difAvg"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="nonLinAvg"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="avgNonLin"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="bıcSacAvg"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id="sacAvg"></label></td>
+                    <td style="border-left: 2px solid #ddd; border-bottom: 2px solid #ddd"><label class="control-label" id=""></label></td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<center><a href="/Home/Index" class="btn btn-success" style="width: 10%;border-radius: 1rem;border: none;">Home</a></center>
+
+
+<input type="hidden" name="GridHtml" id="htmlValue" />
+<input value="@ViewBag.Sbox" id="importSboxVal" type="hidden" />
+<div class="row" style="margin-top:3%">
+    <div class="col-md-8">
+        <label id="sboxVal" class="label"></label>
+    </div>
+
+</div>
+<script>
+
+
+    let SBOX = new Uint8Array(16);
+    $(document).ready(function () {
+        for (let i = 0; i < 4; ++i) {
+            const tr = document.createElement('tr'),
+                td = document.createElement('td');
+            td.textContent = i.toString(16).toUpperCase() + '0';
+            tr.appendChild(td);
+            for (let j = 4; j--;)
+                tr.appendChild(document.createElement('td'));
+            box.appendChild(tr);
+        }
+        if ($("#importSboxVal").val() != null) {
+            var data = $("#importSboxVal").val();
+            loadGrid(data);
+            SBOX = data;
+        }
+
+
+    });
+
+
+
+    function loadGrid(data) {
+        var arr = data.split('-');
+        for (let i = 16; i--;)
+            box.children[i >> 2].children[(i & 3) + 1].textContent = arr[i].toString(16).toUpperCase().padStart(2, '0');
+    }
+
+    $("#import").click(function () {
+        const str = prompt('Enter the Sbox as comma separated values.');
+        var sbox = new Object();
+        sbox.sboxStingValue = str;
+        if (str != null) {
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/ImportSboxValues",
+                data: JSON.stringify(sbox),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                SBOX = data;
+                loadGrid(data);
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+        }
+        else {
+
+        }
+
+    });
+
+
+    $("#random").click(function () {
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/RandomSboxValues",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+        function successFunc(data, status) {
+            SBOX = data;
+            loadGrid(data);
+        }
+
+        function errorFunc() {
+            alert('error');
+        }
+    });
+
+    $("#analysis").click(function () {
+        if (SBOX.byteOffset == 0) {
+            alert("Please Enter Sbox Values");
+        }
+        else {
+            var sbox = new Object();
+            sbox.sbox = SBOX;
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/Analysis",
+                data: JSON.stringify(sbox),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc(data, status) {
+                $("#linearMax").text(data.MaxLinearProbability + '%');
+                $("#linearMin").text(data.MinLinearProbability + '%');
+                $("#linearAvg").text(data.AvgLinearProbability + '%');
+
+                $("#difMax").text(data.MaxDifferentialProbability + '%');
+                $("#difMin").text(data.MinDifferentialProbability + '%');
+                $("#difAvg").text(data.AvgDifferentialProbability + '%');
+
+                $("#nonLinMax").text(data.MaxNonLinearProbability + '%');
+                $("#nonLinMin").text(data.MinNonLinearProbability + '%');
+                $("#nonLinAvg").text(data.AvgNonLinearProbability + '%');
+
+                $("#bıcSacAvg").text(data.BıcSacAvg + '%');
+                $("#bıcSacMin").text(data.BıcSacMin + '%');
+                $("#bıcSacMax").text(data.BıcSacMax + '%');
+
+                $("#sacAvg").text(data.SacAvg + '%');
+                $("#sacMin").text(data.SacMin + '%');
+                $("#sacMax").text(data.SacMax + '%');
+                $("#maxNonLin").text(data.NonLinearProbabilityMax);
+                $("#minNonLin").text(data.NonLinearProbabilityMin);
+                $("#avgNonLin").text(data.NonLinearProbabilityAvg);
+                $("#bicNl").text(data.BicNl);
+
+
+
+
+                $("input[name='ExportData']").val($("#htmlSbox").html());
+
+
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+        }
+
+    });
+
+    $("#export").click(function () {
+        var sbox = new Object();
+        sbox.sbox = SBOX;
+        $.ajax({
+            type: "POST",
+            url: "/Home/ExportSboxValues",
+            data: JSON.stringify(sbox),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+        function successFunc(data, status) {
+            prompt('Ctrl + C to copy the Sbox', data)
+        }
+
+        function errorFunc() {
+            alert('error');
+        }
+    });
+</script>
